@@ -5,7 +5,7 @@ import (
 	goastarter "goa_starter/gen/goa_starter"
 	goa_starterpb "goa_starter/gen/grpc/goa_starter/pb"
 	goastartersvr "goa_starter/gen/grpc/goa_starter/server"
-	"log"
+	log "goa_starter/gen/log"
 	"net"
 	"net/url"
 	"sync"
@@ -26,7 +26,7 @@ func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 		adapter middleware.Logger
 	)
 	{
-		adapter = middleware.NewLogger(logger)
+		adapter = logger
 	}
 
 	// Wrap the endpoints with the transport specific layers. The generated
@@ -53,7 +53,7 @@ func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 
 	for svc, info := range srv.GetServiceInfo() {
 		for _, m := range info.Methods {
-			logger.Printf("serving gRPC method %s", svc+"/"+m.Name)
+			logger.Infof("serving gRPC method %s", svc+"/"+m.Name)
 		}
 	}
 
@@ -71,12 +71,12 @@ func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 			if err != nil {
 				errc <- err
 			}
-			logger.Printf("gRPC server listening on %q", u.Host)
+			logger.Infof("gRPC server listening on %q", u.Host)
 			errc <- srv.Serve(lis)
 		}()
 
 		<-ctx.Done()
-		logger.Printf("shutting down gRPC server at %q", u.Host)
+		logger.Infof("shutting down gRPC server at %q", u.Host)
 		srv.Stop()
 	}()
 }

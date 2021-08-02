@@ -6,6 +6,8 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/rs/zerolog v1.17.2 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/zap v1.18.1 // indirect
 	goa.design/goa/v3 v3.4.3
 	goa.design/plugins/v3 v3.4.3 // indirect
 	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect

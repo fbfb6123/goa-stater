@@ -4,13 +4,14 @@ import (
 	"context"
 	goastarter "goa_starter/gen/goa_starter"
 	goastartersvr "goa_starter/gen/http/goa_starter/server"
-	"log"
+	log "goa_starter/gen/log"
 	"net/http"
 	"net/url"
 	"os"
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
 	goahttp "goa.design/goa/v3/http"
 	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
@@ -25,7 +26,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 		adapter middleware.Logger
 	)
 	{
-		adapter = middleware.NewLogger(logger)
+		adapter = logger
 	}
 
 	// Provide the transport specific request decoder and response encoder.
@@ -76,7 +77,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	// configure the server as required by your service.
 	srv := &http.Server{Addr: u.Host, Handler: handler}
 	for _, m := range goaStarterServer.Mounts {
-		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+		logger.Infof("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 
 	(*wg).Add(1)
@@ -85,12 +86,12 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 
 		// Start HTTP server in a separate goroutine.
 		go func() {
-			logger.Printf("HTTP server listening on %q", u.Host)
+			logger.Infof("HTTP server listening on %q", u.Host)
 			errc <- srv.ListenAndServe()
 		}()
 
 		<-ctx.Done()
-		logger.Printf("shutting down HTTP server at %q", u.Host)
+		logger.Infof("shutting down HTTP server at %q", u.Host)
 
 		// Shutdown gracefully with a 30s timeout.
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -107,6 +108,6 @@ func errorHandler(logger *log.Logger) func(context.Context, http.ResponseWriter,
 	return func(ctx context.Context, w http.ResponseWriter, err error) {
 		id := ctx.Value(middleware.RequestIDKey).(string)
 		_, _ = w.Write([]byte("[" + id + "] encoding: " + err.Error()))
-		logger.Printf("[%s] ERROR: %s", id, err.Error())
+		logger.With(zap.String("id", id)).Error(err.Error())
 	}
 }

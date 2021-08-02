@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	goastarterapi "goa_starter"
 	goastarter "goa_starter/gen/goa_starter"
-	goastarterapi "goa_starter/presentation"
-	"log"
+	log "goa_starter/gen/log"
 	"net"
 	"net/url"
 	"os"
@@ -33,7 +33,7 @@ func main() {
 		logger *log.Logger
 	)
 	{
-		logger = log.New(os.Stderr, "[goastarterapi] ", log.Ltime)
+		logger = log.New("goastarterapi", false)
 	}
 
 	// Initialize the services.
@@ -128,11 +128,11 @@ func main() {
 	}
 
 	// Wait for signal.
-	logger.Printf("exiting (%v)", <-errc)
+	logger.Infof("exiting (%v)", <-errc)
 
 	// Send cancellation signal to the goroutines.
 	cancel()
 
 	wg.Wait()
-	logger.Println("exited")
+	logger.Info("exited")
 }
