@@ -4,10 +4,10 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
-var _ = API("calc", func() {
-	Title("Calculator Service")
+var _ = API("goa_starter", func() {
+	Title("goa_starterulator Service")
 	Description("Service for adding numbers, a Goa teaser")
-	Server("calc", func() {
+	Server("goa_starter", func() {
 		Host("localhost", func() {
 			URI("http://localhost:8085/api/v1")
 			URI("grpc://localhost:8080")
@@ -15,8 +15,8 @@ var _ = API("calc", func() {
 	})
 })
 
-var _ = Service("calc", func() {
-	Description("The calc service performs operations on numbers.")
+var _ = Service("goa_starter", func() {
+	Description("The goa_starter service performs operations on numbers.")
 
 	Method("add", func() {
 		Payload(func() {
