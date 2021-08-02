@@ -1,17 +1,17 @@
 openapi: 3.0.3
 info:
-  title: goa_starter Service
+  title: Calculator Service
   description: Service for adding numbers, a Goa teaser
   version: "1.0"
 servers:
-- url: http://localhost:8000
+- url: http://localhost:8085/api/v1
 paths:
   /add/{a}/{b}:
     get:
       tags:
-      - goa_starter
-      summary: add goa_starter
-      operationId: goa_starter#add
+      - calc
+      summary: add calc
+      operationId: calc#add
       parameters:
       - name: a
         in: path
@@ -20,9 +20,9 @@ paths:
         schema:
           type: integer
           description: Left operand
-          example: 6419660624874047229
+          example: 5401762099778430809
           format: int64
-        example: 1281283253422316480
+        example: 1918630006328122782
       - name: b
         in: path
         description: Right operand
@@ -30,9 +30,9 @@ paths:
         schema:
           type: integer
           description: Right operand
-          example: 4926453738764371526
+          example: 4288748512599820841
           format: int64
-        example: 4341158392534231492
+        example: 4212629202012168060
       responses:
         "200":
           description: OK response.
@@ -40,19 +40,19 @@ paths:
             application/json:
               schema:
                 type: integer
-                example: 6813310404858571690
+                example: 8803302123552712831
                 format: int64
-              example: 5121140462866214315
+              example: 1698882017578366363
   /openapi.json:
     get:
       tags:
-      - goa_starter
+      - calc
       summary: Download ./gen/http/openapi.json
-      operationId: goa_starter#/openapi.json
+      operationId: calc#/openapi.json
       responses:
         "200":
           description: File downloaded
 components: {}
 tags:
-- name: goa_starter
-  description: The goa_starter service performs operations on numbers.
+- name: calc
+  description: The calc service performs operations on numbers.

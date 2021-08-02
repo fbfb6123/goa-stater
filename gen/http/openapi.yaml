@@ -1,9 +1,9 @@
 swagger: "2.0"
 info:
-  title: goa_starter Service
+  title: Calculator Service
   description: Service for adding numbers, a Goa teaser
   version: ""
-host: localhost:8000
+host: localhost:8085
 consumes:
 - application/json
 - application/xml
@@ -16,9 +16,9 @@ paths:
   /add/{a}/{b}:
     get:
       tags:
-      - goa_starter
-      summary: add goa_starter
-      operationId: goa_starter#add
+      - calc
+      summary: add calc
+      operationId: calc#add
       parameters:
       - name: a
         in: path
@@ -41,9 +41,9 @@ paths:
   /openapi.json:
     get:
       tags:
-      - goa_starter
+      - calc
       summary: Download ./gen/http/openapi.json
-      operationId: goa_starter#/openapi.json
+      operationId: calc#/openapi.json
       responses:
         "200":
           description: File downloaded
