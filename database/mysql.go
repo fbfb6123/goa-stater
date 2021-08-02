@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"skyflag-backend-offerwall/gen/log"
+	"goastarter/gen/log"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
