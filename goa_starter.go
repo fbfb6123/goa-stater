@@ -22,28 +22,3 @@ func (s *goaStartersrvc) Add(ctx context.Context, p *goastarter.AddPayload) (res
 	s.logger.Info("goaStarter.add")
 	return p.A + p.B, nil
 }
-
-// func (s *goaStartersrvc) Get(ctx context.Context, p *goastarter.AddPayload) (res int, err error) {
-// 	s.logger.Info("goaStarter.add")
-// 	return p.A + p.B, nil
-// }
-
-// func (s *offerAttributessrvc) Get(ctx context.Context, p *offerattributes.GetPayload) (*offerattributes.OfferResponse, error) {
-// 	res := &offerattributes.OfferResponse{}
-// 	s.logger.Info("offerAttributes.get")
-
-// 	id := uint64(p.ID)
-
-// 	s.logger.Info("offer ID : " + string(rune(id)))
-
-// 	u := usecase.NewOfferUseCase(s.logger)
-
-// 	off, err := u.Get(ctx, id)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	res.CreateFromOffer(off)
-
-// 	return res, nil
-// }

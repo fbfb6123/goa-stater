@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"goastarter/gen/log"
+	"goa_starter/gen/log"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -21,7 +21,7 @@ type Config struct {
 	Password   string
 }
 
-var logger = log.New("skyflag-backend-offerwall", true)
+var logger = log.New("goa_starter", true)
 
 func (c *Config) Open() (*gorm.DB, error) {
 	db, err := gorm.Open(mysql.New(mysql.Config{

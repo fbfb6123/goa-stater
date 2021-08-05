@@ -23,7 +23,7 @@ func BuildAddPayload(goaStarterCalcAddMessage string) (*goastartercalc.AddPayloa
 		if goaStarterCalcAddMessage != "" {
 			err = json.Unmarshal([]byte(goaStarterCalcAddMessage), &message)
 			if err != nil {
-				return nil, fmt.Errorf("invalid JSON for message, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"c\": 8428770013074316282,\n      \"d\": 7396536983462351961\n   }'")
+				return nil, fmt.Errorf("invalid JSON for message, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"c\": 4695121332388354409,\n      \"d\": 7668356220174435247\n   }'")
 			}
 		}
 	}

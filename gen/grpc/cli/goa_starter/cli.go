@@ -12,6 +12,7 @@ import (
 	"fmt"
 	goastarterc "goa_starter/gen/grpc/goa_starter/client"
 	goastartercalcc "goa_starter/gen/grpc/goa_starter_calc/client"
+	termlimitc "goa_starter/gen/grpc/term_limit/client"
 	"os"
 
 	goa "goa.design/goa/v3/pkg"
@@ -25,18 +26,24 @@ import (
 func UsageCommands() string {
 	return `goa-starter add
 goa-starter-calc add
+term-limit get
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` goa-starter add --message '{
-      "a": 5121140462866214315,
-      "b": 2783468530862518908
+      "a": 4835525598530742500,
+      "b": 3683037965649525407
    }'` + "\n" +
 		os.Args[0] + ` goa-starter-calc add --message '{
-      "c": 8428770013074316282,
-      "d": 7396536983462351961
+      "c": 4695121332388354409,
+      "d": 7668356220174435247
+   }'` + "\n" +
+		os.Args[0] + ` term-limit get --message '{
+      "id": 8786081763742979290,
+      "media_id": 4635224356953494713,
+      "muid": "Quia quas expedita nam ex."
    }'` + "\n" +
 		""
 }
@@ -54,12 +61,20 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 
 		goaStarterCalcAddFlags       = flag.NewFlagSet("add", flag.ExitOnError)
 		goaStarterCalcAddMessageFlag = goaStarterCalcAddFlags.String("message", "", "")
+
+		termLimitFlags = flag.NewFlagSet("term-limit", flag.ContinueOnError)
+
+		termLimitGetFlags       = flag.NewFlagSet("get", flag.ExitOnError)
+		termLimitGetMessageFlag = termLimitGetFlags.String("message", "", "")
 	)
 	goaStarterFlags.Usage = goaStarterUsage
 	goaStarterAddFlags.Usage = goaStarterAddUsage
 
 	goaStarterCalcFlags.Usage = goaStarterCalcUsage
 	goaStarterCalcAddFlags.Usage = goaStarterCalcAddUsage
+
+	termLimitFlags.Usage = termLimitUsage
+	termLimitGetFlags.Usage = termLimitGetUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -80,6 +95,8 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 			svcf = goaStarterFlags
 		case "goa-starter-calc":
 			svcf = goaStarterCalcFlags
+		case "term-limit":
+			svcf = termLimitFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -106,6 +123,13 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 			switch epn {
 			case "add":
 				epf = goaStarterCalcAddFlags
+
+			}
+
+		case "term-limit":
+			switch epn {
+			case "get":
+				epf = termLimitGetFlags
 
 			}
 
@@ -143,6 +167,13 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 				endpoint = c.Add()
 				data, err = goastartercalcc.BuildAddPayload(*goaStarterCalcAddMessageFlag)
 			}
+		case "term-limit":
+			c := termlimitc.NewClient(cc, opts...)
+			switch epn {
+			case "get":
+				endpoint = c.Get()
+				data, err = termlimitc.BuildGetPayload(*termLimitGetMessageFlag)
+			}
 		}
 	}
 	if err != nil {
@@ -174,8 +205,8 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` goa-starter add --message '{
-      "a": 5121140462866214315,
-      "b": 2783468530862518908
+      "a": 4835525598530742500,
+      "b": 3683037965649525407
    }'
 `, os.Args[0])
 }
@@ -202,8 +233,37 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` goa-starter-calc add --message '{
-      "c": 8428770013074316282,
-      "d": 7396536983462351961
+      "c": 4695121332388354409,
+      "d": 7668356220174435247
+   }'
+`, os.Args[0])
+}
+
+// term-limitUsage displays the usage of the term-limit command and its
+// subcommands.
+func termLimitUsage() {
+	fmt.Fprintf(os.Stderr, `OW表示可能一覧取得
+Usage:
+    %s [globalflags] term-limit COMMAND [flags]
+
+COMMAND:
+    get: Get implements get.
+
+Additional help:
+    %s term-limit COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func termLimitGetUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] term-limit get -message JSON
+
+Get implements get.
+    -message JSON: 
+
+Example:
+    `+os.Args[0]+` term-limit get --message '{
+      "id": 8786081763742979290,
+      "media_id": 4635224356953494713,
+      "muid": "Quia quas expedita nam ex."
    }'
 `, os.Args[0])
 }

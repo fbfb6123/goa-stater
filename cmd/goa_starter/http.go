@@ -6,7 +6,9 @@ import (
 	goastartercalc "goa_starter/gen/goa_starter_calc"
 	goastartersvr "goa_starter/gen/http/goa_starter/server"
 	goastartercalcsvr "goa_starter/gen/http/goa_starter_calc/server"
+	termlimitsvr "goa_starter/gen/http/term_limit/server"
 	log "goa_starter/gen/log"
+	termlimit "goa_starter/gen/term_limit"
 	"net/http"
 	"net/url"
 	"os"
@@ -21,7 +23,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goastarter.Endpoints, goaStarterCalcEndpoints *goastartercalc.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goastarter.Endpoints, goaStarterCalcEndpoints *goastartercalc.Endpoints, termLimitEndpoints *termlimit.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -54,15 +56,18 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	var (
 		goaStarterServer     *goastartersvr.Server
 		goaStarterCalcServer *goastartercalcsvr.Server
+		termLimitServer      *termlimitsvr.Server
 	)
 	{
 		eh := errorHandler(logger)
 		goaStarterServer = goastartersvr.New(goaStarterEndpoints, mux, dec, enc, eh, nil)
 		goaStarterCalcServer = goastartercalcsvr.New(goaStarterCalcEndpoints, mux, dec, enc, eh, nil)
+		termLimitServer = termlimitsvr.New(termLimitEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
 				goaStarterServer,
 				goaStarterCalcServer,
+				termLimitServer,
 			}
 			servers.Use(httpmdlwr.Debug(mux, os.Stdout))
 		}
@@ -70,6 +75,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	// Configure the mux.
 	goastartersvr.Mount(mux, goaStarterServer)
 	goastartercalcsvr.Mount(mux, goaStarterCalcServer)
+	termlimitsvr.Mount(mux, termLimitServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
 	// here apply to all the service endpoints.
@@ -86,6 +92,9 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 		logger.Infof("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 	for _, m := range goaStarterCalcServer.Mounts {
+		logger.Infof("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+	}
+	for _, m := range termLimitServer.Mounts {
 		logger.Infof("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 

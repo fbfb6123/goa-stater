@@ -12,6 +12,7 @@ import (
 	"fmt"
 	goastarterc "goa_starter/gen/http/goa_starter/client"
 	goastartercalcc "goa_starter/gen/http/goa_starter_calc/client"
+	termlimitc "goa_starter/gen/http/term_limit/client"
 	"net/http"
 	"os"
 
@@ -26,13 +27,17 @@ import (
 func UsageCommands() string {
 	return `goa-starter add
 goa-starter-calc add
+term-limit get
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` goa-starter add --a 5780944714670154445 --b 2801619228705561275` + "\n" +
-		os.Args[0] + ` goa-starter-calc add --c2 6419660624874047229 --d 1281283253422316480` + "\n" +
+	return os.Args[0] + ` goa-starter add --a 2783468530862518908 --b 5219281975954383774` + "\n" +
+		os.Args[0] + ` goa-starter-calc add --c2 4786448540459506888 --d 7305426396677949776` + "\n" +
+		os.Args[0] + ` term-limit get --body '{
+      "id": 36983429280391996
+   }' --muid "At vel maxime." --media-id 10477105092621605603` + "\n" +
 		""
 }
 
@@ -57,12 +62,22 @@ func ParseEndpoint(
 		goaStarterCalcAddFlags  = flag.NewFlagSet("add", flag.ExitOnError)
 		goaStarterCalcAddC2Flag = goaStarterCalcAddFlags.String("c2", "REQUIRED", "Left operand")
 		goaStarterCalcAddDFlag  = goaStarterCalcAddFlags.String("d", "REQUIRED", "Right operand")
+
+		termLimitFlags = flag.NewFlagSet("term-limit", flag.ContinueOnError)
+
+		termLimitGetFlags       = flag.NewFlagSet("get", flag.ExitOnError)
+		termLimitGetBodyFlag    = termLimitGetFlags.String("body", "REQUIRED", "")
+		termLimitGetMuidFlag    = termLimitGetFlags.String("muid", "REQUIRED", "")
+		termLimitGetMediaIDFlag = termLimitGetFlags.String("media-id", "REQUIRED", "")
 	)
 	goaStarterFlags.Usage = goaStarterUsage
 	goaStarterAddFlags.Usage = goaStarterAddUsage
 
 	goaStarterCalcFlags.Usage = goaStarterCalcUsage
 	goaStarterCalcAddFlags.Usage = goaStarterCalcAddUsage
+
+	termLimitFlags.Usage = termLimitUsage
+	termLimitGetFlags.Usage = termLimitGetUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -83,6 +98,8 @@ func ParseEndpoint(
 			svcf = goaStarterFlags
 		case "goa-starter-calc":
 			svcf = goaStarterCalcFlags
+		case "term-limit":
+			svcf = termLimitFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -109,6 +126,13 @@ func ParseEndpoint(
 			switch epn {
 			case "add":
 				epf = goaStarterCalcAddFlags
+
+			}
+
+		case "term-limit":
+			switch epn {
+			case "get":
+				epf = termLimitGetFlags
 
 			}
 
@@ -146,6 +170,13 @@ func ParseEndpoint(
 				endpoint = c.Add()
 				data, err = goastartercalcc.BuildAddPayload(*goaStarterCalcAddC2Flag, *goaStarterCalcAddDFlag)
 			}
+		case "term-limit":
+			c := termlimitc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "get":
+				endpoint = c.Get()
+				data, err = termlimitc.BuildGetPayload(*termLimitGetBodyFlag, *termLimitGetMuidFlag, *termLimitGetMediaIDFlag)
+			}
 		}
 	}
 	if err != nil {
@@ -177,7 +208,7 @@ Add implements add.
     -b INT: Right operand
 
 Example:
-    `+os.Args[0]+` goa-starter add --a 5780944714670154445 --b 2801619228705561275
+    `+os.Args[0]+` goa-starter add --a 2783468530862518908 --b 5219281975954383774
 `, os.Args[0])
 }
 
@@ -203,6 +234,35 @@ Add implements add.
     -d INT: Right operand
 
 Example:
-    `+os.Args[0]+` goa-starter-calc add --c2 6419660624874047229 --d 1281283253422316480
+    `+os.Args[0]+` goa-starter-calc add --c2 4786448540459506888 --d 7305426396677949776
+`, os.Args[0])
+}
+
+// term-limitUsage displays the usage of the term-limit command and its
+// subcommands.
+func termLimitUsage() {
+	fmt.Fprintf(os.Stderr, `OW表示可能一覧取得
+Usage:
+    %s [globalflags] term-limit COMMAND [flags]
+
+COMMAND:
+    get: Get implements get.
+
+Additional help:
+    %s term-limit COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func termLimitGetUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] term-limit get -body JSON -muid STRING -media-id UINT64
+
+Get implements get.
+    -body JSON: 
+    -muid STRING: 
+    -media-id UINT64: 
+
+Example:
+    `+os.Args[0]+` term-limit get --body '{
+      "id": 36983429280391996
+   }' --muid "At vel maxime." --media-id 10477105092621605603
 `, os.Args[0])
 }

@@ -8,7 +8,10 @@ import (
 	goastartersvr "goa_starter/gen/grpc/goa_starter/server"
 	goa_starter_calcpb "goa_starter/gen/grpc/goa_starter_calc/pb"
 	goastartercalcsvr "goa_starter/gen/grpc/goa_starter_calc/server"
+	term_limitpb "goa_starter/gen/grpc/term_limit/pb"
+	termlimitsvr "goa_starter/gen/grpc/term_limit/server"
 	log "goa_starter/gen/log"
+	termlimit "goa_starter/gen/term_limit"
 	"net"
 	"net/url"
 	"sync"
@@ -22,7 +25,7 @@ import (
 
 // handleGRPCServer starts configures and starts a gRPC server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goastarter.Endpoints, goaStarterCalcEndpoints *goastartercalc.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goastarter.Endpoints, goaStarterCalcEndpoints *goastartercalc.Endpoints, termLimitEndpoints *termlimit.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -39,10 +42,12 @@ func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	var (
 		goaStarterServer     *goastartersvr.Server
 		goaStarterCalcServer *goastartercalcsvr.Server
+		termLimitServer      *termlimitsvr.Server
 	)
 	{
 		goaStarterServer = goastartersvr.New(goaStarterEndpoints, nil)
 		goaStarterCalcServer = goastartercalcsvr.New(goaStarterCalcEndpoints, nil)
+		termLimitServer = termlimitsvr.New(termLimitEndpoints, nil)
 	}
 
 	// Initialize gRPC server with the middleware.
@@ -56,6 +61,7 @@ func handleGRPCServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	// Register the servers.
 	goa_starterpb.RegisterGoaStarterServer(srv, goaStarterServer)
 	goa_starter_calcpb.RegisterGoaStarterCalcServer(srv, goaStarterCalcServer)
+	term_limitpb.RegisterTermLimitServer(srv, termLimitServer)
 
 	for svc, info := range srv.GetServiceInfo() {
 		for _, m := range info.Methods {

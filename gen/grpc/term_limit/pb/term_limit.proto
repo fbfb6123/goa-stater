@@ -1,0 +1,33 @@
+// Code generated with goa v3.4.3, DO NOT EDIT.
+//
+// term_limit protocol buffer definition
+//
+// Command:
+// $ goa gen goa_starter/design
+
+syntax = "proto3";
+
+package term_limit;
+
+option go_package = "/term_limitpb";
+
+// OW表示可能一覧取得
+service TermLimit {
+	// Get implements get.
+	rpc Get (GetRequest) returns (GetResponse);
+}
+
+message GetRequest {
+	// term_limit のID
+	sint32 id = 1;
+	// MUID
+	string muid = 2;
+	// メディアID
+	uint64 media_id = 3;
+}
+
+message GetResponse {
+	uint64 id = 1;
+	uint64 offer_id = 2;
+	uint64 status = 3;
+}
