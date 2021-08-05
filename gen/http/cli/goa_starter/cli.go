@@ -11,6 +11,7 @@ import (
 	"flag"
 	"fmt"
 	goastarterc "goa_starter/gen/http/goa_starter/client"
+	termlimitc "goa_starter/gen/http/term_limit/client"
 	"net/http"
 	"os"
 
@@ -24,12 +25,14 @@ import (
 //
 func UsageCommands() string {
 	return `goa-starter add
+term-limit add
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` goa-starter add --a 3393616720772912859 --b 403367966753150629` + "\n" +
+	return os.Args[0] + ` goa-starter add --a 5780944714670154445 --b 2801619228705561275` + "\n" +
+		os.Args[0] + ` term-limit add --c2 6419660624874047229 --d 1281283253422316480` + "\n" +
 		""
 }
 
@@ -48,9 +51,18 @@ func ParseEndpoint(
 		goaStarterAddFlags = flag.NewFlagSet("add", flag.ExitOnError)
 		goaStarterAddAFlag = goaStarterAddFlags.String("a", "REQUIRED", "Left operand")
 		goaStarterAddBFlag = goaStarterAddFlags.String("b", "REQUIRED", "Right operand")
+
+		termLimitFlags = flag.NewFlagSet("term-limit", flag.ContinueOnError)
+
+		termLimitAddFlags  = flag.NewFlagSet("add", flag.ExitOnError)
+		termLimitAddC2Flag = termLimitAddFlags.String("c2", "REQUIRED", "Left operand")
+		termLimitAddDFlag  = termLimitAddFlags.String("d", "REQUIRED", "Right operand")
 	)
 	goaStarterFlags.Usage = goaStarterUsage
 	goaStarterAddFlags.Usage = goaStarterAddUsage
+
+	termLimitFlags.Usage = termLimitUsage
+	termLimitAddFlags.Usage = termLimitAddUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -69,6 +81,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "goa-starter":
 			svcf = goaStarterFlags
+		case "term-limit":
+			svcf = termLimitFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -88,6 +102,13 @@ func ParseEndpoint(
 			switch epn {
 			case "add":
 				epf = goaStarterAddFlags
+
+			}
+
+		case "term-limit":
+			switch epn {
+			case "add":
+				epf = termLimitAddFlags
 
 			}
 
@@ -117,6 +138,13 @@ func ParseEndpoint(
 			case "add":
 				endpoint = c.Add()
 				data, err = goastarterc.BuildAddPayload(*goaStarterAddAFlag, *goaStarterAddBFlag)
+			}
+		case "term-limit":
+			c := termlimitc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "add":
+				endpoint = c.Add()
+				data, err = termlimitc.BuildAddPayload(*termLimitAddC2Flag, *termLimitAddDFlag)
 			}
 		}
 	}
@@ -149,6 +177,32 @@ Add implements add.
     -b INT: Right operand
 
 Example:
-    `+os.Args[0]+` goa-starter add --a 3393616720772912859 --b 403367966753150629
+    `+os.Args[0]+` goa-starter add --a 5780944714670154445 --b 2801619228705561275
+`, os.Args[0])
+}
+
+// term-limitUsage displays the usage of the term-limit command and its
+// subcommands.
+func termLimitUsage() {
+	fmt.Fprintf(os.Stderr, `The term_limit service performs operations on numbers.
+Usage:
+    %s [globalflags] term-limit COMMAND [flags]
+
+COMMAND:
+    add: Add implements add.
+
+Additional help:
+    %s term-limit COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func termLimitAddUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] term-limit add -c2 INT -d INT
+
+Add implements add.
+    -c2 INT: Left operand
+    -d INT: Right operand
+
+Example:
+    `+os.Args[0]+` term-limit add --c2 6419660624874047229 --d 1281283253422316480
 `, os.Args[0])
 }

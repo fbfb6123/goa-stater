@@ -20,9 +20,9 @@ paths:
         schema:
           type: integer
           description: Left operand
-          example: 6419660624874047229
+          example: 8034677293779011882
           format: int64
-        example: 1281283253422316480
+        example: 36983429280391996
       - name: b
         in: path
         description: Right operand
@@ -30,9 +30,9 @@ paths:
         schema:
           type: integer
           description: Right operand
-          example: 4926453738764371526
+          example: 1553051376274246529
           format: int64
-        example: 4341158392534231492
+        example: 2598324719697404761
       responses:
         "200":
           description: OK response.
@@ -40,19 +40,49 @@ paths:
             application/json:
               schema:
                 type: integer
-                example: 6813310404858571690
+                example: 7305426396677949776
                 format: int64
-              example: 5121140462866214315
-  /openapi.json:
+              example: 7905194824815223204
+  /term_limit/{c}/{d}:
     get:
       tags:
-      - goa_starter
-      summary: Download ./gen/http/openapi.json
-      operationId: goa_starter#/openapi.json
+      - term_limit
+      summary: add term_limit
+      operationId: term_limit#add
+      parameters:
+      - name: c
+        in: path
+        description: Left operand
+        required: true
+        schema:
+          type: integer
+          description: Left operand
+          example: 3481953999106781257
+          format: int64
+        example: 1253733055766829795
+      - name: d
+        in: path
+        description: Right operand
+        required: true
+        schema:
+          type: integer
+          description: Right operand
+          example: 6782716350968002240
+          format: int64
+        example: 8024987327736100917
       responses:
         "200":
-          description: File downloaded
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 7241277749342655831
+                format: int64
+              example: 8969694167088891872
 components: {}
 tags:
 - name: goa_starter
   description: The goa_starter service performs operations on numbers.
+- name: term_limit
+  description: The term_limit service performs operations on numbers.

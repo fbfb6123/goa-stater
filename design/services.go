@@ -23,6 +23,25 @@ var _ = Service("goa_starter", func() {
 		GRPC(func() {
 		})
 	})
+})
 
-	Files("/openapi.json", "./gen/http/openapi.json")
+var _ = Service("term_limit", func() {
+	Description("The term_limit service performs operations on numbers.")
+
+	Method("add", func() {
+		Payload(func() {
+			Field(1, "c", Int, "Left operand")
+			Field(2, "d", Int, "Right operand")
+			Required("c", "d")
+		})
+
+		Result(Int)
+
+		HTTP(func() {
+			GET("/term_limit/{c}/{d}")
+		})
+
+		GRPC(func() {
+		})
+	})
 })

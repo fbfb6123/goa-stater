@@ -19,10 +19,9 @@ import (
 
 // Server lists the goa_starter service endpoint HTTP handlers.
 type Server struct {
-	Mounts             []*MountPoint
-	Add                http.Handler
-	CORS               http.Handler
-	GenHTTPOpenapiJSON http.Handler
+	Mounts []*MountPoint
+	Add    http.Handler
+	CORS   http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -55,21 +54,14 @@ func New(
 	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
 	errhandler func(context.Context, http.ResponseWriter, error),
 	formatter func(err error) goahttp.Statuser,
-	fileSystemGenHTTPOpenapiJSON http.FileSystem,
 ) *Server {
-	if fileSystemGenHTTPOpenapiJSON == nil {
-		fileSystemGenHTTPOpenapiJSON = http.Dir(".")
-	}
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Add", "GET", "/add/{a}/{b}"},
 			{"CORS", "OPTIONS", "/add/{a}/{b}"},
-			{"CORS", "OPTIONS", "/openapi.json"},
-			{"./gen/http/openapi.json", "GET", "/openapi.json"},
 		},
-		Add:                NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		CORS:               NewCORSHandler(),
-		GenHTTPOpenapiJSON: http.FileServer(fileSystemGenHTTPOpenapiJSON),
+		Add:  NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		CORS: NewCORSHandler(),
 	}
 }
 
@@ -86,7 +78,6 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddHandler(mux, h.Add)
 	MountCORSHandler(mux, h.CORS)
-	MountGenHTTPOpenapiJSON(mux, goahttp.Replace("", "/./gen/http/openapi.json", h.GenHTTPOpenapiJSON))
 }
 
 // MountAddHandler configures the mux to serve the "goa_starter" service "add"
@@ -140,12 +131,6 @@ func NewAddHandler(
 	})
 }
 
-// MountGenHTTPOpenapiJSON configures the mux to serve GET request made to
-// "/openapi.json".
-func MountGenHTTPOpenapiJSON(mux goahttp.Muxer, h http.Handler) {
-	mux.Handle("GET", "/openapi.json", HandleGoaStarterOrigin(h).ServeHTTP)
-}
-
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service goa_starter.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -157,7 +142,6 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/add/{a}/{b}", f)
-	mux.Handle("OPTIONS", "/openapi.json", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

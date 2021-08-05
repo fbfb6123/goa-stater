@@ -1,0 +1,29 @@
+// Code generated with goa v3.4.3, DO NOT EDIT.
+//
+// term_limit protocol buffer definition
+//
+// Command:
+// $ goa gen goa_starter/design
+
+syntax = "proto3";
+
+package term_limit;
+
+option go_package = "/term_limitpb";
+
+// The term_limit service performs operations on numbers.
+service TermLimit {
+	// Add implements add.
+	rpc Add (AddRequest) returns (AddResponse);
+}
+
+message AddRequest {
+	// Left operand
+	sint32 c = 1;
+	// Right operand
+	sint32 d = 2;
+}
+
+message AddResponse {
+	sint32 field = 1;
+}

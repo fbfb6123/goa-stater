@@ -4,7 +4,9 @@ import (
 	"context"
 	goastarter "goa_starter/gen/goa_starter"
 	goastartersvr "goa_starter/gen/http/goa_starter/server"
+	termlimitsvr "goa_starter/gen/http/term_limit/server"
 	log "goa_starter/gen/log"
+	termlimit "goa_starter/gen/term_limit"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,7 +21,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goastarter.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goastarter.Endpoints, termLimitEndpoints *termlimit.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -51,19 +53,23 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	// responses.
 	var (
 		goaStarterServer *goastartersvr.Server
+		termLimitServer  *termlimitsvr.Server
 	)
 	{
 		eh := errorHandler(logger)
-		goaStarterServer = goastartersvr.New(goaStarterEndpoints, mux, dec, enc, eh, nil, nil)
+		goaStarterServer = goastartersvr.New(goaStarterEndpoints, mux, dec, enc, eh, nil)
+		termLimitServer = termlimitsvr.New(termLimitEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
 				goaStarterServer,
+				termLimitServer,
 			}
 			servers.Use(httpmdlwr.Debug(mux, os.Stdout))
 		}
 	}
 	// Configure the mux.
 	goastartersvr.Mount(mux, goaStarterServer)
+	termlimitsvr.Mount(mux, termLimitServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
 	// here apply to all the service endpoints.
@@ -77,6 +83,9 @@ func handleHTTPServer(ctx context.Context, u *url.URL, goaStarterEndpoints *goas
 	// configure the server as required by your service.
 	srv := &http.Server{Addr: u.Host, Handler: handler}
 	for _, m := range goaStarterServer.Mounts {
+		logger.Infof("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+	}
+	for _, m := range termLimitServer.Mounts {
 		logger.Infof("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 

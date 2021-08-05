@@ -38,16 +38,28 @@ paths:
             format: int64
       schemes:
       - http
-  /openapi.json:
+  /term_limit/{c}/{d}:
     get:
       tags:
-      - goa_starter
-      summary: Download ./gen/http/openapi.json
-      operationId: goa_starter#/openapi.json
+      - term_limit
+      summary: add term_limit
+      operationId: term_limit#add
+      parameters:
+      - name: c
+        in: path
+        description: Left operand
+        required: true
+        type: integer
+      - name: d
+        in: path
+        description: Right operand
+        required: true
+        type: integer
       responses:
         "200":
-          description: File downloaded
+          description: OK response.
           schema:
-            type: file
+            type: integer
+            format: int64
       schemes:
       - http
