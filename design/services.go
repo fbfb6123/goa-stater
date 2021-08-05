@@ -25,8 +25,8 @@ var _ = Service("goa_starter", func() {
 	})
 })
 
-var _ = Service("term_limit", func() {
-	Description("The term_limit service performs operations on numbers.")
+var _ = Service("goa_starter-calc", func() {
+	Description("The goa_starter-calc service performs operations on numbers.")
 
 	Method("add", func() {
 		Payload(func() {
@@ -38,7 +38,7 @@ var _ = Service("term_limit", func() {
 		Result(Int)
 
 		HTTP(func() {
-			GET("/term_limit/{c}/{d}")
+			GET("/goa_starter-calc/{c}/{d}")
 		})
 
 		GRPC(func() {

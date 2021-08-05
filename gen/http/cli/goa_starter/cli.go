@@ -11,7 +11,7 @@ import (
 	"flag"
 	"fmt"
 	goastarterc "goa_starter/gen/http/goa_starter/client"
-	termlimitc "goa_starter/gen/http/term_limit/client"
+	goastartercalcc "goa_starter/gen/http/goa_starter_calc/client"
 	"net/http"
 	"os"
 
@@ -25,14 +25,14 @@ import (
 //
 func UsageCommands() string {
 	return `goa-starter add
-term-limit add
+goa-starter-calc add
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` goa-starter add --a 5780944714670154445 --b 2801619228705561275` + "\n" +
-		os.Args[0] + ` term-limit add --c2 6419660624874047229 --d 1281283253422316480` + "\n" +
+		os.Args[0] + ` goa-starter-calc add --c2 6419660624874047229 --d 1281283253422316480` + "\n" +
 		""
 }
 
@@ -52,17 +52,17 @@ func ParseEndpoint(
 		goaStarterAddAFlag = goaStarterAddFlags.String("a", "REQUIRED", "Left operand")
 		goaStarterAddBFlag = goaStarterAddFlags.String("b", "REQUIRED", "Right operand")
 
-		termLimitFlags = flag.NewFlagSet("term-limit", flag.ContinueOnError)
+		goaStarterCalcFlags = flag.NewFlagSet("goa-starter-calc", flag.ContinueOnError)
 
-		termLimitAddFlags  = flag.NewFlagSet("add", flag.ExitOnError)
-		termLimitAddC2Flag = termLimitAddFlags.String("c2", "REQUIRED", "Left operand")
-		termLimitAddDFlag  = termLimitAddFlags.String("d", "REQUIRED", "Right operand")
+		goaStarterCalcAddFlags  = flag.NewFlagSet("add", flag.ExitOnError)
+		goaStarterCalcAddC2Flag = goaStarterCalcAddFlags.String("c2", "REQUIRED", "Left operand")
+		goaStarterCalcAddDFlag  = goaStarterCalcAddFlags.String("d", "REQUIRED", "Right operand")
 	)
 	goaStarterFlags.Usage = goaStarterUsage
 	goaStarterAddFlags.Usage = goaStarterAddUsage
 
-	termLimitFlags.Usage = termLimitUsage
-	termLimitAddFlags.Usage = termLimitAddUsage
+	goaStarterCalcFlags.Usage = goaStarterCalcUsage
+	goaStarterCalcAddFlags.Usage = goaStarterCalcAddUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -81,8 +81,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "goa-starter":
 			svcf = goaStarterFlags
-		case "term-limit":
-			svcf = termLimitFlags
+		case "goa-starter-calc":
+			svcf = goaStarterCalcFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -105,10 +105,10 @@ func ParseEndpoint(
 
 			}
 
-		case "term-limit":
+		case "goa-starter-calc":
 			switch epn {
 			case "add":
-				epf = termLimitAddFlags
+				epf = goaStarterCalcAddFlags
 
 			}
 
@@ -139,12 +139,12 @@ func ParseEndpoint(
 				endpoint = c.Add()
 				data, err = goastarterc.BuildAddPayload(*goaStarterAddAFlag, *goaStarterAddBFlag)
 			}
-		case "term-limit":
-			c := termlimitc.NewClient(scheme, host, doer, enc, dec, restore)
+		case "goa-starter-calc":
+			c := goastartercalcc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
 			case "add":
 				endpoint = c.Add()
-				data, err = termlimitc.BuildAddPayload(*termLimitAddC2Flag, *termLimitAddDFlag)
+				data, err = goastartercalcc.BuildAddPayload(*goaStarterCalcAddC2Flag, *goaStarterCalcAddDFlag)
 			}
 		}
 	}
@@ -181,28 +181,28 @@ Example:
 `, os.Args[0])
 }
 
-// term-limitUsage displays the usage of the term-limit command and its
-// subcommands.
-func termLimitUsage() {
-	fmt.Fprintf(os.Stderr, `The term_limit service performs operations on numbers.
+// goa-starter-calcUsage displays the usage of the goa-starter-calc command and
+// its subcommands.
+func goaStarterCalcUsage() {
+	fmt.Fprintf(os.Stderr, `The goa_starter-calc service performs operations on numbers.
 Usage:
-    %s [globalflags] term-limit COMMAND [flags]
+    %s [globalflags] goa-starter-calc COMMAND [flags]
 
 COMMAND:
     add: Add implements add.
 
 Additional help:
-    %s term-limit COMMAND --help
+    %s goa-starter-calc COMMAND --help
 `, os.Args[0], os.Args[0])
 }
-func termLimitAddUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] term-limit add -c2 INT -d INT
+func goaStarterCalcAddUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] goa-starter-calc add -c2 INT -d INT
 
 Add implements add.
     -c2 INT: Left operand
     -d INT: Right operand
 
 Example:
-    `+os.Args[0]+` term-limit add --c2 6419660624874047229 --d 1281283253422316480
+    `+os.Args[0]+` goa-starter-calc add --c2 6419660624874047229 --d 1281283253422316480
 `, os.Args[0])
 }

@@ -1,0 +1,29 @@
+// Code generated with goa v3.4.3, DO NOT EDIT.
+//
+// goa_starter-calc protocol buffer definition
+//
+// Command:
+// $ goa gen goa_starter/design
+
+syntax = "proto3";
+
+package goa_starter_calc;
+
+option go_package = "/goa_starter_calcpb";
+
+// The goa_starter-calc service performs operations on numbers.
+service GoaStarterCalc {
+	// Add implements add.
+	rpc Add (AddRequest) returns (AddResponse);
+}
+
+message AddRequest {
+	// Left operand
+	sint32 c = 1;
+	// Right operand
+	sint32 d = 2;
+}
+
+message AddResponse {
+	sint32 field = 1;
+}

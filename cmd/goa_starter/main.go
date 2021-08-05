@@ -6,8 +6,8 @@ import (
 	"fmt"
 	goastarterapi "goa_starter"
 	goastarter "goa_starter/gen/goa_starter"
+	goastartercalc "goa_starter/gen/goa_starter_calc"
 	log "goa_starter/gen/log"
-	termlimit "goa_starter/gen/term_limit"
 	"net"
 	"net/url"
 	"os"
@@ -39,23 +39,23 @@ func main() {
 
 	// Initialize the services.
 	var (
-		goaStarterSvc goastarter.Service
-		termLimitSvc  termlimit.Service
+		goaStarterSvc     goastarter.Service
+		goaStarterCalcSvc goastartercalc.Service
 	)
 	{
 		goaStarterSvc = goastarterapi.NewGoaStarter(logger)
-		termLimitSvc = goastarterapi.NewTermLimit(logger)
+		goaStarterCalcSvc = goastarterapi.NewGoaStarterCalc(logger)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services
 	// potentially running in different processes.
 	var (
-		goaStarterEndpoints *goastarter.Endpoints
-		termLimitEndpoints  *termlimit.Endpoints
+		goaStarterEndpoints     *goastarter.Endpoints
+		goaStarterCalcEndpoints *goastartercalc.Endpoints
 	)
 	{
 		goaStarterEndpoints = goastarter.NewEndpoints(goaStarterSvc)
-		termLimitEndpoints = termlimit.NewEndpoints(termLimitSvc)
+		goaStarterCalcEndpoints = goastartercalc.NewEndpoints(goaStarterCalcSvc)
 	}
 
 	// Create channel used by both the signal handler and server goroutines
@@ -99,7 +99,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host = net.JoinHostPort(u.Host, ":80")
 			}
-			handleHTTPServer(ctx, u, goaStarterEndpoints, termLimitEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, goaStarterEndpoints, goaStarterCalcEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 		{
@@ -125,7 +125,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host = net.JoinHostPort(u.Host, ":8080")
 			}
-			handleGRPCServer(ctx, u, goaStarterEndpoints, termLimitEndpoints, &wg, errc, logger, *dbgF)
+			handleGRPCServer(ctx, u, goaStarterEndpoints, goaStarterCalcEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

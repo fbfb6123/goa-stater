@@ -11,7 +11,7 @@ import (
 	"flag"
 	"fmt"
 	goastarterc "goa_starter/gen/grpc/goa_starter/client"
-	termlimitc "goa_starter/gen/grpc/term_limit/client"
+	goastartercalcc "goa_starter/gen/grpc/goa_starter_calc/client"
 	"os"
 
 	goa "goa.design/goa/v3/pkg"
@@ -24,7 +24,7 @@ import (
 //
 func UsageCommands() string {
 	return `goa-starter add
-term-limit add
+goa-starter-calc add
 `
 }
 
@@ -34,7 +34,7 @@ func UsageExamples() string {
       "a": 5121140462866214315,
       "b": 2783468530862518908
    }'` + "\n" +
-		os.Args[0] + ` term-limit add --message '{
+		os.Args[0] + ` goa-starter-calc add --message '{
       "c": 8428770013074316282,
       "d": 7396536983462351961
    }'` + "\n" +
@@ -50,16 +50,16 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 		goaStarterAddFlags       = flag.NewFlagSet("add", flag.ExitOnError)
 		goaStarterAddMessageFlag = goaStarterAddFlags.String("message", "", "")
 
-		termLimitFlags = flag.NewFlagSet("term-limit", flag.ContinueOnError)
+		goaStarterCalcFlags = flag.NewFlagSet("goa-starter-calc", flag.ContinueOnError)
 
-		termLimitAddFlags       = flag.NewFlagSet("add", flag.ExitOnError)
-		termLimitAddMessageFlag = termLimitAddFlags.String("message", "", "")
+		goaStarterCalcAddFlags       = flag.NewFlagSet("add", flag.ExitOnError)
+		goaStarterCalcAddMessageFlag = goaStarterCalcAddFlags.String("message", "", "")
 	)
 	goaStarterFlags.Usage = goaStarterUsage
 	goaStarterAddFlags.Usage = goaStarterAddUsage
 
-	termLimitFlags.Usage = termLimitUsage
-	termLimitAddFlags.Usage = termLimitAddUsage
+	goaStarterCalcFlags.Usage = goaStarterCalcUsage
+	goaStarterCalcAddFlags.Usage = goaStarterCalcAddUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -78,8 +78,8 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 		switch svcn {
 		case "goa-starter":
 			svcf = goaStarterFlags
-		case "term-limit":
-			svcf = termLimitFlags
+		case "goa-starter-calc":
+			svcf = goaStarterCalcFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -102,10 +102,10 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 
 			}
 
-		case "term-limit":
+		case "goa-starter-calc":
 			switch epn {
 			case "add":
-				epf = termLimitAddFlags
+				epf = goaStarterCalcAddFlags
 
 			}
 
@@ -136,12 +136,12 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 				endpoint = c.Add()
 				data, err = goastarterc.BuildAddPayload(*goaStarterAddMessageFlag)
 			}
-		case "term-limit":
-			c := termlimitc.NewClient(cc, opts...)
+		case "goa-starter-calc":
+			c := goastartercalcc.NewClient(cc, opts...)
 			switch epn {
 			case "add":
 				endpoint = c.Add()
-				data, err = termlimitc.BuildAddPayload(*termLimitAddMessageFlag)
+				data, err = goastartercalcc.BuildAddPayload(*goaStarterCalcAddMessageFlag)
 			}
 		}
 	}
@@ -180,28 +180,28 @@ Example:
 `, os.Args[0])
 }
 
-// term-limitUsage displays the usage of the term-limit command and its
-// subcommands.
-func termLimitUsage() {
-	fmt.Fprintf(os.Stderr, `The term_limit service performs operations on numbers.
+// goa-starter-calcUsage displays the usage of the goa-starter-calc command and
+// its subcommands.
+func goaStarterCalcUsage() {
+	fmt.Fprintf(os.Stderr, `The goa_starter-calc service performs operations on numbers.
 Usage:
-    %s [globalflags] term-limit COMMAND [flags]
+    %s [globalflags] goa-starter-calc COMMAND [flags]
 
 COMMAND:
     add: Add implements add.
 
 Additional help:
-    %s term-limit COMMAND --help
+    %s goa-starter-calc COMMAND --help
 `, os.Args[0], os.Args[0])
 }
-func termLimitAddUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] term-limit add -message JSON
+func goaStarterCalcAddUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] goa-starter-calc add -message JSON
 
 Add implements add.
     -message JSON: 
 
 Example:
-    `+os.Args[0]+` term-limit add --message '{
+    `+os.Args[0]+` goa-starter-calc add --message '{
       "c": 8428770013074316282,
       "d": 7396536983462351961
    }'
