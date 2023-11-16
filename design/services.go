@@ -52,19 +52,19 @@ var _ = Service("term_limit", func() {
 	Method("get", func() {
 		Payload(func() {
 			Field(1, "id", Int, "term_limit のID")
-			Field(2, "muid", String, "MUID")
-			Field(3, "media_id", UInt64, "メディアID")
+			// Field(2, "muid", String, "MUID")
+			// Field(3, "media_id", UInt64, "メディアID")
 			Required("id")
-			Required("muid")
-			Required("media_id")
+			// Required("muid")
+			// Required("media_id")
 		})
 
 		Result(TermLimitResponse)
 
 		HTTP(func() {
 			GET("/term_limit")
-			Param("muid", String, "endUserのMUID")
-			Param("media_id", UInt64, "メディアID")
+			// Param("muid", String, "endUserのMUID")
+			// Param("media_id", UInt64, "メディアID")
 		})
 
 		GRPC(func() {

@@ -8,5 +8,6 @@ import (
 )
 
 type TermLimitRepository interface {
+	// Find(*entity.TermLimit, *sf_error.SfError)
 	FindByID(ID uint64, tx *gorm.DB) (*entity.TermLimit, *sf_error.SfError)
 }

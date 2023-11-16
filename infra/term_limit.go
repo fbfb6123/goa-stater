@@ -20,6 +20,10 @@ func (_ *TermLimitRepository) TableName() string {
 	return "term_limit"
 }
 
+func (_ *TermLimitRepository) TermLIimitTableName() string {
+	return "term_limit"
+}
+
 func (r *TermLimitRepository) FindByID(ID uint64, tx *gorm.DB) (*entity.TermLimit, *sf_error.SfError) {
 	var db *gorm.DB
 	var e entity.TermLimit
@@ -30,6 +34,28 @@ func (r *TermLimitRepository) FindByID(ID uint64, tx *gorm.DB) (*entity.TermLimi
 	} else {
 		db = r.db.Debug().Table(r.TableName()).Where("id = ?", ID).
 			First(&e)
+	}
+
+	if db.Error == gorm.ErrRecordNotFound {
+		return nil, sf_error.NewSfError(sf_error.NotFoundError, db.Error.Error())
+	} else if db.Error != nil {
+		return nil, sf_error.NewSfError(sf_error.InternalError, db.Error.Error())
+	}
+
+	return &e, nil
+}
+
+
+func (r *TermLimitRepository) Find(ID uint64, tx *gorm.DB) (*entity.TermLimit, *sf_error.SfError) {
+	var db *gorm.DB
+	var e entity.TermLimit
+
+	if tx != nil {
+		db = tx.Debug().Table(r.TermLIimitTableName()).Where("id = ?", ID).
+		Find(&e)
+	} else {
+		db = r.db.Debug().Table(r.TermLIimitTableName()).Where("id = ?", ID).
+		Find(&e)
 	}
 
 	if db.Error == gorm.ErrRecordNotFound {

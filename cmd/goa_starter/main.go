@@ -41,7 +41,7 @@ func main() {
 	// Initialize the services.
 	var (
 		goaStarterSvc     goastarter.Service
-		goaStarterCalcSvc goastartercalc.Servicea
+		goaStarterCalcSvc goastartercalc.Service
 		termLimitSvc      termlimit.Service
 	)
 	{

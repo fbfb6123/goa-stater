@@ -13,12 +13,12 @@ var TermLimitResponse = ResultType("application/vnd.term_limit", func() {
 	Attributes(func() {
 		Field(1, "id", UInt64)
 		Field(2, "offer_id", UInt64)
-		Field(3, "status", UInt64)
+		// Field(3, "status", UInt64)
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("offer_id")
-		Attribute("status")
+		// Attribute("status")
 	})
-	Required("id", "offer_id", "status")
+	Required("id", "offer_id")
 })
